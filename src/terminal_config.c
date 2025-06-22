@@ -29,8 +29,7 @@ editorConfig editorC;
 void disableRawMode(){
 	if(editorC.raw_mode){
 		if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &orgi_termios) == -1) {
-			loggerWriteInformation("Don't was possible disable raw mode of the file: <>", editorC.filename);
-			die("logger: it wasn't possible disable raw mode");
+			die("Fatal Error: it wasn't possible disable raw mode");
 		}
 		editorC.raw_mode = 0;
 	}

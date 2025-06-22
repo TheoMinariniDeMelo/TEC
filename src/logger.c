@@ -4,29 +4,6 @@
 #include <time.h>
 #include <string.h>
 
-typedef enum {
-	ERROR = 1,
-	INFO = 2
-} messageType; 
-
-typedef struct{
-	char* log_dir;
-	int logInMessages;
-	FILE* file_log;
-} loggerConfig;
-
-typedef struct{
-	char* content;
-	messageType type;	
-} message;
-
-typedef struct {
-	message* contents;
-	long sizeb; // bytes
-	size_t size;
-
-} messages;
-
 messages msgs;
 loggerConfig lgconfig;
 

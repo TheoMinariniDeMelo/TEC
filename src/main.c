@@ -13,5 +13,4 @@ int main(int argc, char** argv){
 	while(read(STDIN_FILENO, &c, 1) != -1){
 		printf("%d\r\n",c);
 	}
-	
 }
