@@ -28,17 +28,20 @@ editorConfig editorC;
  * */
 void disableRawMode(){
 	if(editorC.raw_mode){
-		if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &orgi_termios) == -1) {
-			die("Fatal Error: it wasn't possible disable raw mode");
-		}
+		if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &orgi_termios) == -1) die("tcsetattr");
 		editorC.raw_mode = 0;
 	}
 }
 void enableRawMode(){
-	tcgetattr(STDIN_FILENO, &orgi_termios);
+	if(!isatty(STDIN_FILENO)){
+		die("Fatal Error: the STDIN is not a tty");
+	}
+	if(tcgetattr(STDIN_FILENO, &orgi_termios) == -1) die ("tcgetattr");
 	struct termios raw = orgi_termios;
 	atexit(disableRawMode);
 	raw.c_lflag &= ~(ECHO | ICANON | ISIG | IEXTEN); 
 	raw.c_iflag &= ~(BRKINT | IXON);
+	raw.c_cc[VMIN] = 0; // quantidade mínima de bytes para a syscall read retornar o valor
+	raw.c_cc[VTIME] = 1; // 1 mili segundos de delay para retorno do read
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
