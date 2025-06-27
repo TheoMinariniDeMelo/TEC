@@ -4,7 +4,7 @@
 #include "./logger.h"
 #include "./terminal_config.h" 
 
-editorConfig E;
+extern editorConfig E;
 
 
 void disableRawMode(){

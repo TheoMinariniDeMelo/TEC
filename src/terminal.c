@@ -4,21 +4,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "./terminal.h"
-#include "./terminal_config.h"
-
 #include "sys/ioctl.h"
 
-extern editorConfig E;
+editorConfig E;
 
 void clearRefreshScreen(){
-	write(STDOUT_FILENO, "\x1b[2J", 4);
-	write(STDOUT_FILENO, "\x1b[H", 3);
-	editorDrawRows();
+	abuf ab = ABUF_INIT;	
+	abAppend(&ab, "\x1b[?25l", 6);
+	abAppend(&ab, "\x1b[2J", 4);
+	abAppend(&ab, "\x1b[H", 3);
+	
+	editorDrawRows(&ab);
+
+	abAppend(&ab, "\x1b[?25h", 6);
+	
+	write(STDOUT_FILENO, ab.content, ab.size);
+	abFree(&ab);
 }
-void editorDrawRows(){
+void editorDrawRows(abuf *ab){
 	for(int i = 0; i < E.numrow; i++){
-		write(STDOUT_FILENO, "~", 1);
-		if(i < E.numrow -1) write(STDOUT_FILENO, "\r\n", 2);
+		abAppend(ab, "~", 1);
+		if(i < E.numrow -1) abAppend(ab, "\r\n", 2);
 	}
 }
 

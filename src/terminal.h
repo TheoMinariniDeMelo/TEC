@@ -1,3 +1,5 @@
+#include "./data.h"
+
 void die(char *msg);
 
 void clearRefreshScreen();
@@ -8,5 +10,5 @@ int getCursorPosition(int *row, int *col);
 
 char readkeypress();
 
-void editorDrawRows();
+void editorDrawRows(abuf *ab);
 

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "./terminal_config.h"
-#include "./terminal.h"
 #include "./process_keys.c"
 
 void initEditor(){

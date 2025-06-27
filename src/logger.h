@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "terminal.h"
+#include "./terminal.h"
 
 typedef enum {
 	ERROR = 1,
