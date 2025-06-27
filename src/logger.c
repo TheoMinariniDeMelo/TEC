@@ -27,11 +27,6 @@ void messageAppend(char* msg, messageType type){
 	msgs.contents[msgs.size - 1].type = type;
 }
 
-void die(char *msg){
-	perror(msg);
-	exit(1);
-}
-
 void loggerWriteInformation(char *info){
 	FILE* file = lgconfig.file_log;
 

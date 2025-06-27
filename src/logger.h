@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include "terminal.h"
+
 typedef enum {
 	ERROR = 1,
 	INFO = 2
@@ -24,11 +26,6 @@ typedef struct {
 
 
 void messageAppend(char* msg, messageType type);
-
-/*
- * Write a line into stderr and exit the program
- * */
-void die(char* msg);
 
 /*
  * Get current timestamp and convert it in a date time
