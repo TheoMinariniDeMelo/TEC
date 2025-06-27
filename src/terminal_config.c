@@ -35,4 +35,4 @@ void enableRawMode(){
 	raw.c_cc[VMIN] = 0; // quantidade mínima de bytes para a syscall read retornar o valor
 	raw.c_cc[VTIME] = 1; // 1 mili segundos de delay para retorno do read
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
-	}
+}

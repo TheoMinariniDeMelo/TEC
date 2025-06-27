@@ -15,5 +15,4 @@ void editorProcessKeyPress(){
 		default:
 			printf("%c\n", c);
 	}
-	sleep(1);
 }

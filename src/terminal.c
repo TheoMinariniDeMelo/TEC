@@ -3,9 +3,10 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "./terminal.h"
-#include "sys/ioctl.h"
-
+#include <sys/ioctl.h>
+#include <string.h>
 editorConfig E;
 
 void clearRefreshScreen(){
@@ -16,21 +17,30 @@ void clearRefreshScreen(){
 	
 	editorDrawRows(&ab);
 
+	char buf[32];
+	snprintf(buf, sizeof(buf), "\x1[%d;%dH", E.cy + 1, E.cx + 1);
+	abAppend(&ab, buf, strlen(buf));
 	abAppend(&ab, "\x1b[?25h", 6);
 	
 	write(STDOUT_FILENO, ab.content, ab.size);
 	abFree(&ab);
 }
 void editorDrawRows(abuf *ab){
+	char *welcome_message = "TEC V1";
 	for(int i = 0; i < E.numrow; i++){
 		abAppend(ab, "~", 1);
+		if(i == E.numrow / 3){
+			int padding = (E.numcol - strlen(welcome_message))/2;
+			while(--padding) abAppend(ab, " ", 1);
+			abAppend(ab, welcome_message, strlen(welcome_message));
+		}
 		if(i < E.numrow -1) abAppend(ab, "\r\n", 2);
 	}
-}
+}	
 
 int getWindowSize(/*int *row, int *col*/){
 	struct winsize ws;
-	if( 1|| ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0){
+	if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0){
 		if(write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12 ) != 12) return -1;
 		return getCursorPosition(&E.numrow, &E.numcol);
 	}else {

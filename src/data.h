@@ -8,6 +8,7 @@ typedef struct {
 } erow;
 
 typedef struct {
+	int cx, cy;
 	struct termios orgi_termios;	
 	char* filename;
 	int raw_mode;
