@@ -7,6 +7,7 @@
 #include "./terminal.h"
 #include <sys/ioctl.h>
 #include <string.h>
+
 editorConfig E;
 
 void clearRefreshScreen(){
@@ -18,7 +19,7 @@ void clearRefreshScreen(){
 	editorDrawRows(&ab);
 
 	char buf[32];
-	snprintf(buf, sizeof(buf), "\x1[%d;%dH", E.cy + 1, E.cx + 1);
+	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
 	abAppend(&ab, buf, strlen(buf));
 	abAppend(&ab, "\x1b[?25h", 6);
 	
@@ -72,11 +73,24 @@ void die(char *msg){
 	exit(1);
 }
 
-char readkeypress(){
+int readkeypress(){
 	char c;
 	int nread;
 	while((nread = read(STDIN_FILENO, &c, 1)) <= 0){
 		if(nread == -1 && errno != EAGAIN) die("error in read stdin");
+	}
+	if(c == '\x1b'){
+	 	char seq[3];
+		if(read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
+		if(read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
+		if(seq[0] == '['){
+			switch(seq[1]){
+				case 'A': return ARROW_UP; 
+				case 'B': return ARROW_DOWN;
+				case 'C': return ARROW_RIGHT;
+				case 'D': return ARROW_LEFT;
+			}
+		}
 	}
 	return c;
 }
