@@ -5,6 +5,7 @@
 
 typedef struct {
 	char* content;
+	size_t size;
 } erow;
 
 typedef struct {

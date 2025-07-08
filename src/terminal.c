@@ -8,6 +8,8 @@
 #include <sys/ioctl.h>
 #include <string.h>
 
+#define TEC_VERSION "0.0.1"
+
 editorConfig E;
 
 void clearRefreshScreen(){
@@ -27,13 +29,14 @@ void clearRefreshScreen(){
 	abFree(&ab);
 }
 void editorDrawRows(abuf *ab){
-	char *welcome_message = "TEC V1";
 	for(int i = 0; i < E.numrow; i++){
 		abAppend(ab, "~", 1);
 		if(i == E.numrow / 3){
-			int padding = (E.numcol - strlen(welcome_message))/2;
+			char welcome[32];
+			char welcomelen = snprintf(welcome, sizeof(welcome), "TEC %sv", TEC_VERSION);
+			int padding = (E.numcol - welcomelen)/2;
 			while(--padding) abAppend(ab, " ", 1);
-			abAppend(ab, welcome_message, strlen(welcome_message));
+			abAppend(ab, welcome, strlen(welcome));
 		}
 		if(i < E.numrow -1) abAppend(ab, "\r\n", 2);
 	}
@@ -84,6 +87,16 @@ int readkeypress(){
 		if(read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
 		if(read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
 		if(seq[0] == '['){
+			if(seq[1] >= '0' && seq[1] <= '9'){
+				if(read(STDIN_FILENO, &seq[2], 1) != 1) return '\x1b';
+				if(seq[2] == '~'){
+					switch(seq[1]){
+						case '3': return DEL_KEY;
+						case '5': return PAGE_UP;
+						case '6': return PAGE_DOWN;
+					}
+				}
+			}
 			switch(seq[1]){
 				case 'A': return ARROW_UP; 
 				case 'B': return ARROW_DOWN;

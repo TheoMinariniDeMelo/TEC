@@ -26,8 +26,6 @@ int main(int argc, char** argv){
 	signal(SIGWINCH, __handler_sig_winch);
 	enableRawMode();
 	initEditor();
-	printf("chegou aqui");
-	char c;
 	while(1){
 		clearRefreshScreen();
 		editorProcessKeyPress();	

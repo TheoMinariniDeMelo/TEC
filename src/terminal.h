@@ -2,10 +2,15 @@
 
 typedef enum{
 	ARROW_UP = 1000,
-	ARROW_DOWN = 1001,
-	ARROW_LEFT = 1002,
-	ARROW_RIGHT = 1003
-} ARROW;
+	ARROW_DOWN,
+	ARROW_LEFT,
+	ARROW_RIGHT,
+	PAGE_UP,
+	PAGE_DOWN,
+	HOME_KEY,
+	END_kEY,
+	DEL_KEY
+} editorKey;
 
 
 void die(char *msg);

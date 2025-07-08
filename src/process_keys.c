@@ -1,5 +1,4 @@
 #include "./terminal.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -11,18 +10,17 @@ extern editorConfig E;
 void editorCursorPosition(int c){
 	switch(c){
 		case ARROW_UP:
-			if(E.cy == 0) break;
-			E.cy -= 1;
+			if(E.cy != 0) E.cy -= 1;
+			break;
 		case ARROW_DOWN:
-			if(E.cy == E.numrow - 1) break;
-			E.cy += 1;
+			if(E.cy != E.numrow - 1) E.cy += 1;
+			break;
 		case ARROW_LEFT:
-			if(E.cx == 0) break;
-			E.cx -= 1;
+			if(E.cx != 0) E.cx -= 1;
+			break;
 		case ARROW_RIGHT:
-			if(E.cx == E.numcol - 1) break;
-			E.cx += 1;
-
+			if(E.cx != E.numcol - 1) E.cx += 1;
+			break;
 	}
 }
 
@@ -30,14 +28,24 @@ void editorProcessKeyPress(){
 	int c = readkeypress();
 	switch (c) {
 		case CTRL_KEY('q'):
+			write(STDOUT_FILENO, "\x1b[2J", 4);
+			write(STDOUT_FILENO, "\x1b[H", 3);
 			exit(0);
 			break;
+		case PAGE_UP:
+		case PAGE_DOWN:
+			{
+				int times = E.numrow;
+				int arrow = c == PAGE_UP ? ARROW_UP : ARROW_DOWN; 
+				while(times--){
+					editorCursorPosition(arrow);
+				}
+				break;
+			}
 		case ARROW_UP:
 		case ARROW_DOWN:
 		case ARROW_LEFT:
 		case ARROW_RIGHT:
 			editorCursorPosition(c);
-		//default:
-		//	printf("%c\n", c);
 	}
 }
