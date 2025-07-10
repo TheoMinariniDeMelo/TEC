@@ -14,30 +14,37 @@ editorConfig E;
 
 void clearRefreshScreen(){
 	abuf ab = ABUF_INIT;	
+	abAppend(&ab, "\x1b[6 q", 5);
 	abAppend(&ab, "\x1b[?25l", 6);
 	abAppend(&ab, "\x1b[2J", 4);
 	abAppend(&ab, "\x1b[H", 3);
-	
+
 	editorDrawRows(&ab);
 
 	char buf[32];
 	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
 	abAppend(&ab, buf, strlen(buf));
 	abAppend(&ab, "\x1b[?25h", 6);
-	
+
 	write(STDOUT_FILENO, ab.content, ab.size);
 	abFree(&ab);
 }
 void editorDrawRows(abuf *ab){
 	for(int i = 0; i < E.numrow; i++){
-		abAppend(ab, "~", 1);
-		if(i == E.numrow / 3){
-			char welcome[32];
-			char welcomelen = snprintf(welcome, sizeof(welcome), "TEC %sv", TEC_VERSION);
-			int padding = (E.numcol - welcomelen)/2;
-			while(--padding) abAppend(ab, " ", 1);
-			abAppend(ab, welcome, strlen(welcome));
+		if(i >= E.num_rows){
+			abAppend(ab, "~", 1);
+			if(i == E.numrow / 3 && E.num_rows != 0){
+				char welcome[32];
+				char welcomelen = snprintf(welcome, sizeof(welcome), "TEC %sv", TEC_VERSION);
+				int padding = (E.numcol - welcomelen)/2;
+				while(--padding) abAppend(ab, " ", 1);
+				abAppend(ab, welcome, strlen(welcome));
+			}
+		}else{
+			abAppendRow(ab, &E.rows[i]);
 		}
+		abAppend(ab, "\x1b[K", 3);
+
 		if(i < E.numrow -1) abAppend(ab, "\r\n", 2);
 	}
 }	
@@ -71,7 +78,7 @@ int getCursorPosition(int *row, int *col){
 void die(char *msg){
 	write(STDOUT_FILENO, "\x1b[2J", 4);
 	write(STDOUT_FILENO, "\x1b[H", 3);
-	
+
 	perror(msg);
 	exit(1);
 }
@@ -83,7 +90,7 @@ int readkeypress(){
 		if(nread == -1 && errno != EAGAIN) die("error in read stdin");
 	}
 	if(c == '\x1b'){
-	 	char seq[3];
+		char seq[3];
 		if(read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
 		if(read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
 		if(seq[0] == '['){

@@ -1,9 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
 #include "./terminal_config.h"
 #include "./process_keys.c"
+#include "./file.h"
 
 volatile int resize_terminal = 0;
 
@@ -17,15 +16,15 @@ void __handler_sig_winch(int sig){
 }
 
 int main(int argc, char** argv){
-	if(argc != 2){
-		printf("Enter with a filename:");
-		exit(1);
+	char* filename = "";
+	if(argc == 2){
+		filename = argv[1];
 	}
-	
-	char* filename = argv[1];
+
 	signal(SIGWINCH, __handler_sig_winch);
 	enableRawMode();
 	initEditor();
+	editorOpen(filename);
 	while(1){
 		clearRefreshScreen();
 		editorProcessKeyPress();	

@@ -1,3 +1,10 @@
+#include "./data.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+extern editorConfig E;
+
 void editorOpen(char* filename){
-	char* message	
+	FILE *fd = fopen(filename, "r")
 }

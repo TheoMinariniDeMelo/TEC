@@ -16,6 +16,7 @@ typedef struct {
 	int numrow;
 	int numcol;
 	erow *rows;
+	size_t num_rows;
 } editorConfig;
 
 typedef struct {
@@ -24,5 +25,7 @@ typedef struct {
 } abuf;
 
 void abAppend(abuf *ab, char* str, size_t size);
+
+void abAppendRow(abuf *ab, erow *row);
 
 void abFree(abuf *ab);

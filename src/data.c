@@ -11,7 +11,15 @@ void abAppend(abuf *ab, char* str, size_t size){
 	ab->content = new_content;
 	ab->size += size;
 }
+void abAppendRow(abuf *ab, erow *row){
+	//char *new_content = realloc(ab->content, ab->size + size);
+	//if(new_content == NULL) return; 	
+	//
+	//memcpy(&new_content[ab->size], str, size);
+	//ab->content = new_content;
+	//ab->size += size;
 
+}
 void abFree(abuf *ab){
 	free(ab->content);
 }
