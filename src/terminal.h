@@ -8,7 +8,7 @@ typedef enum{
 	PAGE_UP,
 	PAGE_DOWN,
 	HOME_KEY,
-	END_kEY,
+	END_KEY,
 	DEL_KEY
 } editorKey;
 

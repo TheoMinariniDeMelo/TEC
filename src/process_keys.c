@@ -19,7 +19,7 @@ void editorCursorPosition(int c){
 			if(E.cx != 0) E.cx -= 1;
 			break;
 		case ARROW_RIGHT:
-			if(E.cx != E.numcol - 1) E.cx += 1;
+			if(E.cx != E.numcol - 6) E.cx += 1;
 			break;
 	}
 }
@@ -27,10 +27,15 @@ void editorCursorPosition(int c){
 void editorProcessKeyPress(){
 	int c = readkeypress();
 	switch (c) {
-		case CTRL_KEY('q'):
+		case '\x03':
 			write(STDOUT_FILENO, "\x1b[2J", 4);
 			write(STDOUT_FILENO, "\x1b[H", 3);
 			exit(0);
+			break;
+		case HOME_KEY:
+			E.cx = 0;
+			break;
+		case END_KEY:
 			break;
 		case PAGE_UP:
 		case PAGE_DOWN:

@@ -10,7 +10,7 @@
 
 #define TEC_VERSION "0.0.1"
 
-editorConfig E;
+extern editorConfig E;
 
 void clearRefreshScreen(){
 	abuf ab = ABUF_INIT;	
@@ -18,21 +18,30 @@ void clearRefreshScreen(){
 	abAppend(&ab, "\x1b[?25l", 6);
 	abAppend(&ab, "\x1b[2J", 4);
 	abAppend(&ab, "\x1b[H", 3);
-
 	editorDrawRows(&ab);
 
 	char buf[32];
-	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 6);
 	abAppend(&ab, buf, strlen(buf));
 	abAppend(&ab, "\x1b[?25h", 6);
 
 	write(STDOUT_FILENO, ab.content, ab.size);
 	abFree(&ab);
 }
+
 void editorDrawRows(abuf *ab){
-	for(int i = 0; i < E.numrow; i++){
+	E.numrow = 20;
+	for(int i = 0, j = 1; i < E.numrow; i++, j++){
+		char side[32];	
+		ssize_t len = snprintf(
+			side, sizeof(side), "\x1b[2m%c%c%c%d \x1b[0m", 
+	   		j>=1000 ? '\0' : ' ', 
+			j>=100 ? '\0' : ' ', 
+			j>=10 ? '\0' : ' ', 
+			j 
+		);	
+
 		if(i >= E.num_rows){
-			abAppend(ab, "~", 1);
 			if(i == E.numrow / 3 && E.num_rows != 0){
 				char welcome[32];
 				char welcomelen = snprintf(welcome, sizeof(welcome), "TEC %sv", TEC_VERSION);
@@ -40,16 +49,17 @@ void editorDrawRows(abuf *ab){
 				while(--padding) abAppend(ab, " ", 1);
 				abAppend(ab, welcome, strlen(welcome));
 			}
-		}else{
+		}
+		else{
+			abAppend(ab, side, len);
 			abAppendRow(ab, &E.rows[i]);
 		}
 		abAppend(ab, "\x1b[K", 3);
-
 		if(i < E.numrow -1) abAppend(ab, "\r\n", 2);
 	}
 }	
 
-int getWindowSize(/*int *row, int *col*/){
+int getWindowSize(){
 	struct winsize ws;
 	if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0){
 		if(write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12 ) != 12) return -1;
@@ -109,6 +119,7 @@ int readkeypress(){
 				case 'B': return ARROW_DOWN;
 				case 'C': return ARROW_RIGHT;
 				case 'D': return ARROW_LEFT;
+				case 'H': return HOME_KEY;
 			}
 		}
 	}

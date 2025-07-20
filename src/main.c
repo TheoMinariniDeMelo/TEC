@@ -14,7 +14,10 @@ void initEditor(){
 void __handler_sig_winch(int sig){
 	if(getWindowSize() != 0) die("Fatal Error: handler sig winch");
 }
-
+void __handler_sig_int(int sig){
+	disableRawMode();
+	exit(0);
+}
 int main(int argc, char** argv){
 	char* filename = "";
 	if(argc == 2){
@@ -22,6 +25,7 @@ int main(int argc, char** argv){
 	}
 
 	signal(SIGWINCH, __handler_sig_winch);
+	signal(SIGINT, __handler_sig_int);
 	enableRawMode();
 	initEditor();
 	editorOpen(filename);

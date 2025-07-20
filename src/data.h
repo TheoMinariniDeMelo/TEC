@@ -26,6 +26,8 @@ typedef struct {
 
 void abAppend(abuf *ab, char* str, size_t size);
 
-void abAppendRow(abuf *ab, erow *row);
+int abAppendRow(abuf *ab, erow *row);
+
+void editorAppendRow(char* line, size_t size);
 
 void abFree(abuf *ab);
