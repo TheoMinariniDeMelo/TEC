@@ -15,6 +15,8 @@ typedef enum{
 
 void die(char *msg);
 
+void editorScroll();
+
 void clearRefreshScreen();
 
 int getWindowSize(/*int *row, int *col*/);
