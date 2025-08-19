@@ -13,6 +13,8 @@ typedef enum{
 } editorKey;
 
 
+void editorDrawStatusBar(abuf* ab);
+
 void die(char *msg);
 
 void editorScroll();

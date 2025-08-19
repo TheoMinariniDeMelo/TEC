@@ -41,6 +41,34 @@ void editorScroll(){
         E.coloff = E.rx - E.numcol + SIDEBAR_NUM_CHARS + 1;	
     }
 }
+
+void editorDrawStatusBar(abuf* ab) {
+    char buf1[32];
+    int size1 = snprintf(buf1, sizeof(buf1), "\x1b[%d;%dH", E.numrow + 1, 0);
+    abAppend(ab, buf1, size1);
+    abAppend(ab, "\x1b[m", 3);
+
+    char buf[256];
+    char jmpspace[E.numcol];
+    abAppend(ab, "\x1b[7m", 4);
+    for(int i = 0; i < E.numcol; i++ ){
+        snprintf(jmpspace + i, sizeof(jmpspace) - i, " ");
+    }
+    abAppend(ab, jmpspace, E.numcol);
+    abAppend(ab, buf1, size1);
+
+    int size = snprintf(buf, sizeof(buf),
+        " %s \x1b[%d;%dH %d:%d ",
+        E.filename ? E.filename : "[No Name]",
+        E.numrow + 1,
+        (E.numcol > 11 ? E.numcol - 11 : 1),
+        E.cy + 1,
+        E.cx + 1
+    );
+    abAppend(ab, buf, size);
+    abAppend(ab, "\x1b[m", 3);
+}
+
 void clearRefreshScreen(){
     editorScroll();
 
@@ -60,10 +88,7 @@ void clearRefreshScreen(){
     write(STDOUT_FILENO, ab.content, ab.size);
     abFree(&ab);
 }
-void editorDrawStatusBar(abuf* ab){
-    abAppend(ab, "\x1b[m", 3);
-    abAppend
-}
+
 void editorDrawRows(abuf *ab){
     for(int y = 0; y < E.numrow; y++){
         int rowfile = y + E.rowoff;
