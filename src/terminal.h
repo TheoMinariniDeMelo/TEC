@@ -19,7 +19,7 @@ void editorScroll();
 
 void clearRefreshScreen();
 
-int getWindowSize(/*int *row, int *col*/);
+int getWindowSize();
 
 int getCursorPosition(int *row, int *col);
 

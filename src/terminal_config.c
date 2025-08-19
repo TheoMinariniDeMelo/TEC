@@ -27,7 +27,6 @@ void enableRawMode(){
 	}
 	if(tcgetattr(STDIN_FILENO, &E.orgi_termios) == -1) die ("tcgetattr");
 	struct termios raw = E.orgi_termios;
-	atexit(disableRawMode);
 	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
 	raw.c_oflag &= ~(OPOST);
 	raw.c_cflag |= (CS8);
@@ -35,4 +34,5 @@ void enableRawMode(){
 	raw.c_cc[VMIN] = 0; // quantidade mínima de bytes para a syscall read retornar o valor
 	raw.c_cc[VTIME] = 1; // 1 mili segundos de delay para retorno do read
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    E.raw_mode = 1;
 }

@@ -13,49 +13,70 @@
 
 extern editorConfig E;
 
+int editorCxToRx(erow* row, int cx){
+    int rx = 0;
+    for(int i = 0; i < cx; i++){
+        if(row->content[i] == '\t'){
+            rx += (TEC_TAB_STOP - 1) - (rx % TEC_TAB_STOP);
+        }
+        rx++;
+    }
+    return rx;
+}
 void editorScroll(){
+    E.rx = 0;
+    if(E.cy < E.num_rows){
+        E.rx = editorCxToRx(&E.rows[E.cy], E.cx);
+    }
     if(E.cy < E.rowoff){
         E.rowoff = E.cy;
     }
-    else if(E.cy >= E.rowoff + E.numrow){
+    if(E.cy >= E.rowoff + E.numrow){
         E.rowoff = E.cy - E.numrow + 1;
     }
-    if(E.cx < E.coloff){
-        E.coloff = E.cx;
+    if(E.rx < E.coloff){
+        E.coloff = E.rx;
     }
-    else if(E.cx >= E.coloff + E.numcol - SIDEBAR_NUM_CHARS){
-        E.coloff = E.cx - E.numcol + SIDEBAR_NUM_CHARS + 1;	
+    if(E.rx >= E.coloff + E.numcol - SIDEBAR_NUM_CHARS){
+        E.coloff = E.rx - E.numcol + SIDEBAR_NUM_CHARS + 1;	
     }
 }
 void clearRefreshScreen(){
     editorScroll();
 
-    abuf ab = ABUF_INIT;	
+    abuf ab = ABUF_INIT;
 
     abAppend(&ab, "\x1b[6 q", 5);
     abAppend(&ab, "\x1b[?25l", 6);
     abAppend(&ab, "\x1b[H", 3);
+
     editorDrawRows(&ab);
+    editorDrawStatusBar(&ab);
     char buf[32];
-    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.cx - E.coloff) + SIDEBAR_NUM_CHARS + 1);
+    snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + SIDEBAR_NUM_CHARS + 1);
     abAppend(&ab, buf, strlen(buf));
     abAppend(&ab, "\x1b[?25h", 6);
 
     write(STDOUT_FILENO, ab.content, ab.size);
     abFree(&ab);
 }
-
+void editorDrawStatusBar(abuf* ab){
+    abAppend(ab, "\x1b[m", 3);
+    abAppend
+}
 void editorDrawRows(abuf *ab){
     for(int y = 0; y < E.numrow; y++){
         int rowfile = y + E.rowoff;
-        char side[32];	
+        char side[32];
+        int value = rowfile + 1;
+
         ssize_t len = snprintf(
             side, sizeof(side), "\x1b[2m%c%c%c%d \x1b[0m", 
-            rowfile>=1000 ? '\0' : ' ', 
-            rowfile>=100 ? '\0' : ' ', 
-            rowfile>=10 ? '\0' : ' ', 
-            rowfile 
-        );	
+            value>=1000 ? '\0' : ' ', 
+            value>=100 ? '\0' : ' ', 
+            value>=10 ? '\0' : ' ', 
+            value 
+        );
 
         if(y >= E.num_rows){
             if(y == E.numrow / 3 && E.num_rows != 0){
@@ -68,10 +89,10 @@ void editorDrawRows(abuf *ab){
         }
         else{
             abAppend(ab, side, len);
-            int len = E.rows[rowfile].size - E.coloff;
+            int len = E.rows[rowfile].rsize - E.coloff;
             if(len < 0) len = 0;
             if(len > E.numcol - SIDEBAR_NUM_CHARS) len = E.numcol - SIDEBAR_NUM_CHARS;
-            abAppend(ab, &E.rows[rowfile].content[E.coloff], len);
+            abAppend(ab, &E.rows[rowfile].render_content[E.coloff], len);
         }
         abAppend(ab, "\x1b[K", 3);
         if(y < E.numrow -1) abAppend(ab, "\r\n", 2);
@@ -139,6 +160,7 @@ int readkeypress(){
                 case 'C': return ARROW_RIGHT;
                 case 'D': return ARROW_LEFT;
                 case 'H': return HOME_KEY;
+                case 'F': return END_KEY;
             }
         }
     }

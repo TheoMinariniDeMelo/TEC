@@ -19,6 +19,7 @@ void initEditor(){
 }
 void __handler_sig_winch(int sig){
     if(getWindowSize() != 0) die("Fatal Error: handler sig winch");
+    E.numrow--;
     clearRefreshScreen();
 }
 void __handler_sig_int(int sig){
@@ -32,9 +33,13 @@ int main(int argc, char** argv){
     }
     signal(SIGWINCH, __handler_sig_winch);
     signal(SIGINT, __handler_sig_int);
+
     enableRawMode();
     initEditor();
+    write(STDOUT_FILENO,"\033[3J", 3);
     editorOpen(filename);
+    E.num_rows -= 1;
+    E.numrow--;
     while(1){
         clearRefreshScreen();
         editorProcessKeyPress();	

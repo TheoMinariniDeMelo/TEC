@@ -1,4 +1,5 @@
 #include "./terminal.h"
+#include "./terminal_config.h"
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -53,12 +54,14 @@ void editorProcessKeyPress(){
         case '\x03':
             write(STDOUT_FILENO, "\x1b[2J", 4);
             write(STDOUT_FILENO, "\x1b[H", 3);
+            disableRawMode();
             exit(0);
             break;
         case HOME_KEY:
             E.cx = 0;
             break;
         case END_KEY:
+            E.cx = E.rows[E.cy].size;
             break;
         case PAGE_UP:
         case PAGE_DOWN:
