@@ -10,6 +10,7 @@
 CLANG
 CLANG
 CLANG
+Meu nome e theo minarini, estudo (algoritmos e estruturas de dados) no curso de Ads
 CLANG
 CLANG
 CLANG

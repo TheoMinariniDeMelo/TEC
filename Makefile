@@ -1,8 +1,8 @@
-SRC=./src
-OBJ=./obj
+SRC=$(wildcard ./src/*.c);
+OBJ=$(SRC:.c=.o)
 CC=gcc
-CCFLAGS=-Wall -g
+CFLAGS=-Wall -g
 
-all: %.o
-	$(CC) $(CCFLAGS) $(OBJ)/@< 
+all: $(OBJ)
+	$(CC) $(CFLAGS) $(OBJ)
 

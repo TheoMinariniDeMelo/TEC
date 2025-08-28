@@ -3,9 +3,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define CTRL_KEY(x) x && 0x1f
-#define PRINTABLE_KEY(x) x && 01111111
-
+#define CTRL_KEY(x) x & 0x1f
+#define PRINTABLE_KEY(x) x & 0b01111111
+#define IS_UPPPERCASE(x) (x & (x | 0b01000000)) == x  
 extern editorConfig E;
 
 void editorCursorPosition(int c){
@@ -73,6 +73,15 @@ void editorProcessKeyPress(){
                 }
                 break;
             }
+        case CTRL_KEY('w'):
+            for(int i = E.cx + 1; i < E.rows[E.cy].size; i++){
+                char c = E.rows[E.cy].content[i]; 
+                if(c == ' '  || c == '(' || c == ')'){
+                    E.cx = ++i;
+                    break;
+                }
+            }
+
         case ARROW_UP:
         case ARROW_DOWN:
         case ARROW_LEFT:
