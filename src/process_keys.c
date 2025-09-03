@@ -1,8 +1,8 @@
 #include "./terminal.h"
 #include "./terminal_config.h"
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-
 #define CTRL_KEY(x) x & 0x1f
 #define PRINTABLE_KEY(x) x & 0b01111111
 #define IS_UPPPERCASE(x) (x & (x | 0b01000000)) == x  
@@ -87,5 +87,33 @@ void editorProcessKeyPress(){
         case ARROW_LEFT:
         case ARROW_RIGHT:
             editorCursorPosition(c);
+            break;
+        case ESC:
+            break;
+        case 0x7f: { // backspace
+            erow *row = &E.rows[E.cy];
+            char *new_content = malloc(row->size - 1);
+            if(E.cx == 0) {
+                editorCursorPosition(ARROW_LEFT);
+                break;
+            }
+            memcpy(new_content, row->content, E.cx - 1);
+            memcpy(new_content + E.cx - 1, row->content + E.cx, row->size - E.cx);
+            free(row->content);
+            row->content = new_content;
+            row->size -= 1;
+            editorUpdateRow(row);
+            editorCursorPosition(ARROW_LEFT);
+            break;
+        }
+        default:{
+            erow *row = &E.rows[E.cy];
+            row->content = realloc(row->content, row->size + 1);
+            memmove(row->content + E.cx + 1, row->content + E.cx, row->size - E.cx);
+            row->content[E.cx] = c;
+            row->size++;
+            editorUpdateRow(row);
+            editorCursorPosition(ARROW_RIGHT);
+        }
     }
 }
