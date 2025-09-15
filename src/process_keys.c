@@ -97,8 +97,8 @@ void editorProcessKeyPress(){
                 editorCursorPosition(ARROW_LEFT);
                 break;
             }
-            memcpy(new_content, row->content, E.cx - 1);
-            memcpy(new_content + E.cx - 1, row->content + E.cx, row->size - E.cx);
+            memmove(new_content, row->content, E.cx - 1);
+            memmove(new_content + E.cx, row->content + E.cx + 1, row->size - E.cx);
             free(row->content);
             row->content = new_content;
             row->size -= 1;
